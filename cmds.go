@@ -63,6 +63,7 @@ func Commands(cmds ...*exec.Cmd) (io.ReadCloser, io.WriteCloser, chan error) {
 	go func() {
 		if err := cmd.Wait(); err != nil {
 			errCh <- err
+			return
 		}
 		// Close this if we finish waiting and have no errors
 		close(errCh)
