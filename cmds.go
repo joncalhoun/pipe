@@ -73,7 +73,7 @@ func Commands(cmds ...*exec.Cmd) (io.ReadCloser, io.WriteCloser, chan error) {
 	return rc, wc, errCh
 }
 
-func New(cmds ...*exec.Cmd) (*Cmds, error) {
+func New(cmds ...*exec.Cmd) (*cmdPipe, error) {
 	if len(cmds) == 0 {
 		return nil, ErrNoCmds
 	}
@@ -91,13 +91,13 @@ func New(cmds ...*exec.Cmd) (*Cmds, error) {
 		cmds[i].Stdin = r
 	}
 
-	return &Cmds{
+	return &cmdPipe{
 		writeClosers: writeClosers,
 		cmds:         cmds,
 	}, nil
 }
 
-type Cmds struct {
+type cmdPipe struct {
 	// Change these *BEFORE* calling start
 	Stdin        io.Reader
 	Stdout       io.Writer
@@ -105,7 +105,7 @@ type Cmds struct {
 	cmds         []*exec.Cmd
 }
 
-func (c *Cmds) Start() error {
+func (c *cmdPipe) Start() error {
 	c.cmds[0].Stdin = c.Stdin
 	c.cmds[len(c.cmds)-1].Stdout = c.Stdout
 	for i := range c.cmds {
@@ -116,7 +116,7 @@ func (c *Cmds) Start() error {
 	return nil
 }
 
-func (c *Cmds) Wait() error {
+func (c *cmdPipe) Wait() error {
 	for i := range c.cmds {
 		if err := c.cmds[i].Wait(); err != nil {
 			return err

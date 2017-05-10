@@ -27,8 +27,41 @@ if err != nil {
 r, w := io.Pipe()
 p.Stdin = r
 p.Stdout = os.Stdout
-p.Start()
+if err := p.Start(); err != nil {
+	panic(err)
+}
+// You should probably error check these too
 t.Execute(w, nil)
 w.Close()
-p.Wait()
+if err := p.Wait(); err != nil {
+	panic(err)
+}
+```
+
+or you can use the `Commands()` function
+
+```go
+t := template.Must(template.New("queue").Parse(`
+package blah
+
+// Bad formatting intentional
+func main() {
+      fmt.Println("hello world!");
+      }
+`))
+rc, wc, errCh := pipe.Commands(
+	exec.Command("gofmt"),
+	exec.Command("goimports"),
+)
+go func() {
+	select {
+	case err, ok := <-errCh:
+		if ok && err != nil {
+			panic(err)
+		}
+	}
+}()
+t.Execute(wc, d)
+wc.Close()
+io.Copy(os.Stdout, rc)
 ```
