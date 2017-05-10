@@ -4,6 +4,8 @@
 
 It has fairy limited uses and isn't as fleshed out as [exec](https://golang.org/pkg/os/exec/) is, but I use it every once in a while for chaining several different commands on the same text file. Eg running `gofmt` and `goimports` on code that I have generated.
 
+This code was initially released as part of a blog post covering how code generation can be used to make more maintainable code in a world without generics. You can find that post here - <https://www.calhoun.io/using-code-generation-to-survive-without-generics-in-go/>
+
 ## Example usage
 
 ```go
